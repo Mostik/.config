@@ -19,6 +19,8 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- vim.api.nvim_set_option("clipboard","unnamed")
 vim.api.nvim_command("set clipboard+=unnamedplus")
+
+vim.api.nvim_command('nnoremap dd "+dd')
 vim.api.nvim_command('nnoremap d "_d')
 vim.api.nvim_command('nnoremap D "_D')
 vim.api.nvim_command('vnoremap d "_d')
