@@ -13,6 +13,10 @@ vim.wo.wrap = false;
 vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
 
+vim.api.nvim_create_autocmd("FileType", {
+  command = "set formatoptions-=cro",
+})
+
 -- vim.api.nvim_set_option("clipboard","unnamed")
 vim.api.nvim_command("set clipboard+=unnamedplus")
 
@@ -71,9 +75,7 @@ lazy.setup({
   { 'wakatime/vim-wakatime', lazy = false },
   'windwp/nvim-autopairs',
   'nmac427/guess-indent.nvim',
-  'ojroques/nvim-bufdel',
-
-  "max397574/better-escape.nvim",
+  'ojroques/nvim-bufdel', -- <leader> c
   {
   'kaiuri/nvim-juliana',
     lazy = false,
@@ -96,18 +98,13 @@ lazy.setup({
     },
   },
   {
-    "folke/which-key.nvim",
-    event = "VeryLazy",
-    init = function()
-      vim.o.timeout = true
-      vim.o.timeoutlen = 300
-    end,
-    opts = {
-      -- your configuration comes here
-      -- or leave it empty to use the default settings
-    }
-  }
-
+    "L3MON4D3/LuaSnip",
+    -- follow latest release.
+    version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+    -- install jsregexp (optional!).
+    build = "make install_jsregexp"
+  },
+  { 'saadparwaiz1/cmp_luasnip' }
 })
 
 vim.cmd.colorscheme( "gruber-darker" )
@@ -146,6 +143,7 @@ require("mason-lspconfig").setup_handlers {
   })
   end
 }
+
 local nvim_lsp = require('lspconfig')
 nvim_lsp.denols.setup {
   on_attach = on_attach,
@@ -161,14 +159,15 @@ nvim_lsp.ts_ls.setup {
 local cmp = require("cmp")
 
 cmp.setup({
-  -- snippet = {
-  --   expand = function(args)
-  --     
-  --   end
-  -- },
+  snippet = {
+    expand = function(args)
+      require('luasnip').lsp_expand(args.body)
+    end
+  },
   sources = cmp.config.sources({
     { name = "nvim_lsp" },
-  }),
+    { name = "luasnip" },
+  }, { name = "buffer"}),
   mapping = cmp.mapping.preset.insert({
     ['<TAB>'] = cmp.mapping.select_next_item(),
     ['<S-TAB>'] = cmp.mapping.select_prev_item(),
@@ -190,6 +189,8 @@ cmp.setup({
   },
 })
 
+-- keymap --
+
 vim.keymap.set({"n", "i"}, "<leader>s", ':Neotree close<CR><cmd> lua require("spectre").toggle()<CR>' )
 vim.keymap.set({"n", "i"}, "<leader>e", '<cmd> lua require("spectre").close()<CR>:Neotree toggle<CR>' )
 vim.keymap.set({"n", "i"}, "<leader>go", ':DiffviewClose<CR>:DiffviewOpen<CR>' )
@@ -207,3 +208,70 @@ vim.keymap.set({"n", "i"}, "<leader>c", ":BufDel<CR>")
 vim.keymap.set({"n", "i"}, "<ESC>", function() vim.cmd("stopinsert") end )
 vim.keymap.set({"i"}, '<D-Space>', '')
 
+-- snippets --
+
+local ls = require("luasnip") 
+local s = ls.snippet
+local sn = ls.snippet_node
+local t = ls.text_node
+local i = ls.insert_node
+local f = ls.function_node
+local c = ls.choice_node
+local d = ls.dynamic_node
+local r = ls.restore_node
+
+ls.add_snippets("javascript,typescript", {
+  s("cl", {
+    t({ "", "console.log(" }),
+    i(0),
+    t({ ")", "" }),
+  }),
+  s("clt", {
+    t({ "", "console.log(\"" }),
+    i(0),
+    t({ "\")", "" }),
+  }),
+  s("edf", {
+    t({ "", "export default function( ) {\n" }),
+    i(0),
+    t({ "}", "" }),
+  })
+})
+
+local js_snippets = function()
+  return {
+    s("cl", {
+      t({ "", "console.log(" }),
+      i(0),
+      t({ ")", "" }),
+    }),
+    s("clt", {
+      t({ "", "console.log(\"" }),
+      i(0),
+      t({ "\")", "" }),
+    }),
+    s("edf", {
+      t({ "", "export default function() {" }),
+      t({ "", "\treturn (" }),
+      i(0),
+      t({ ")", "" }),
+      t({ "}", "" }),
+    })
+  }
+end
+
+ls.add_snippets('javascript', js_snippets())
+ls.add_snippets('typescript', js_snippets())
+ls.add_snippets('javascriptreact', js_snippets())
+ls.add_snippets('typescriptreact', js_snippets())
+
+ls.add_snippets("zig", {
+	s("std", {
+		t({ "", "const std = @import(\"std\")" }),
+	}),
+	s("print", {
+		t({ "", "std.debug.print(\"{any}\", .{" }),
+    i(0),
+    t({ "});", ""})
+	})
+})
