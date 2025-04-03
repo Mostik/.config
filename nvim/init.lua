@@ -227,6 +227,8 @@ vim.keymap.set({"n", "i"}, "<leader>c", ":BufDel<CR>")
 vim.keymap.set({"n", "i"}, "<ESC>", function() vim.cmd("stopinsert") end )
 vim.keymap.set({"i"}, '<D-Space>', '')
 
+vim.keymap.set("v", "p", 'P"_d<Esc>', { noremap = true })
+
 -- snippets --
 
 local ls = require("luasnip") 
