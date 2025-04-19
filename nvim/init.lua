@@ -69,6 +69,7 @@ lazy.setup({
   },
   -- Git
   'sindrets/diffview.nvim',
+  'tveskag/nvim-blame-line',
   -- Color schemes
   'blazkowolf/gruber-darker.nvim',
 
