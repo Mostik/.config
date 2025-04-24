@@ -218,6 +218,7 @@ vim.keymap.set({"n", "i"}, "<leader>gc", ':DiffviewClose<CR>' )
 
 vim.keymap.set({"n", "i"}, "gd", function() vim.lsp.buf.definition() end )
 vim.keymap.set({"n"}, "K", function() vim.lsp.buf.hover() end )
+vim.keymap.set({"n"}, "<leader>ca", function() vim.lsp.buf.code_action() end )
 
 vim.keymap.set({"v"}, "<Tab>", ">gv")
 vim.keymap.set({"v"}, "<S-Tab>", "<gv")
